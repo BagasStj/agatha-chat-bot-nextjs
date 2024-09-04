@@ -1,0 +1,43 @@
+   /* Sesuaikan ukuran font dan padding untuk popup DatePicker */
+   .custom-date-picker .ant-picker-dropdown {
+       font-size: 2px;
+       /* Sesuaikan ukuran font */
+       width: 100px;
+       height: 10px;
+       /* Sesuaikan lebar popup */
+   }
+
+   .custom-date-picker .ant-picker-panel-container {
+       transform: scale(0.86) translateY(9%) !important;
+
+       padding: 8px;
+       height: 10px;
+
+       /* Sesuaikan padding */
+   }
+
+   .custom-date-picker .ant-picker-cell-inner {
+       width: 1.5rem;
+       /* Sesuaikan lebar hari */
+       height: 1.5rem;
+       height: 10px;
+
+       /* Sesuaikan tinggi hari */
+       line-height: 1.5rem;
+       /* Sesuaikan tinggi baris hari */
+   }
+
+   .custom-date-picker .ant-picker-time-panel-column {
+       width: 1px;
+       /* Sesuaikan lebar kolom waktu */
+   }
+
+   .custom-date-picker .ant-picker-header-view button {
+       padding: 0;
+       /* Sesuaikan padding tombol header */
+   }
+
+   .custom-date-picker .ant-picker-footer {
+       padding: 4px;
+       /* Sesuaikan padding footer */
+   }

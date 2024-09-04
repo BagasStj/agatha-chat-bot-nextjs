@@ -1,0 +1,11 @@
+{
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "framework": "nextjs",
+    "rewrites": [
+      {
+        "source": "/api/:path*",
+        "destination": "https://your-python-api-url.vercel.app/api/:path*"
+      }
+    ]
+  }
