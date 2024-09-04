@@ -24,13 +24,13 @@ async function handleWebhook(req: NextRequest) {
             message = params.get('message');
         }
 
-         const systemMessagePrompt2 = 'Anda adalah seorang asisten AI yang sangat ahli dalam memberikan informasi medis dan pengetahuan tentang berbagai kondisi penyakit. Anda hanya dapat menjawab pertanyaan yang terkait dengan kondisi penyakit, pengobatan, gejala, penyebab, dan perawatan yang relevan. Anda tidak dapat menjawab pertanyaan yang berada di luar lingkup medis dan kesehatan. Setiap pertanyaan yang diajukan oleh pengguna tentang kondisi penyakit akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda untuk merujuk ke pertanyaan sebelumnya guna memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan: \n •	Pengguna dapat menanyakan gejala, penyebab, atau pengobatan dari suatu penyakit. \n•	Anda dapat memberikan informasi tentang langkah-langkah pencegahan, perawatan mandiri, atau kapan harus mencari bantuan medis profesional. \n•	Anda dapat menjelaskan perbedaan antara kondisi-kondisi yang sering disalahpahami atau memberikan saran umum berdasarkan pengetahuan medis yang terpercaya. jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban "maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih"';
+        const systemMessagePrompt2 = 'Anda adalah seorang asisten AI yang sangat ahli dalam memberikan informasi medis dan pengetahuan tentang berbagai kondisi penyakit. Anda hanya dapat menjawab pertanyaan yang terkait dengan kondisi penyakit, pengobatan, gejala, penyebab, dan perawatan yang relevan. Anda tidak dapat menjawab pertanyaan yang berada di luar lingkup medis dan kesehatan. Setiap pertanyaan yang diajukan oleh pengguna tentang kondisi penyakit akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda untuk merujuk ke pertanyaan sebelumnya guna memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan: \n •	Pengguna dapat menanyakan gejala, penyebab, atau pengobatan dari suatu penyakit. \n•	Anda dapat memberikan informasi tentang langkah-langkah pencegahan, perawatan mandiri, atau kapan harus mencari bantuan medis profesional. \n•	Anda dapat menjelaskan perbedaan antara kondisi-kondisi yang sering disalahpahami atau memberikan saran umum berdasarkan pengetahuan medis yang terpercaya. jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban "maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih"';
         const ststemMessagePrompt4 = "Anda adalah asisten AI yang sangat berpengetahuan luas dalam hal asuransi kesehatan, termasuk BPJS dan berbagai jenis asuransi kesehatan lainnya. Anda hanya dapat menjawab pertanyaan yang terkait dengan informasi tentang BPJS, asuransi kesehatan, cakupan layanan, prosedur klaim, dan manfaat yang tersedia. Anda tidak dapat menjawab pertanyaan di luar lingkup asuransi kesehatan. Setiap pertanyaan yang diajukan oleh pengguna mengenai BPJS atau asuransi kesehatan akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda merujuk ke pertanyaan sebelumnya untuk memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan:\n •	Pengguna dapat menanyakan tentang jenis layanan yang ditanggung oleh BPJS atau asuransi kesehatan tertentu.\n •	Anda dapat memberikan informasi tentang prosedur pendaftaran BPJS atau asuransi kesehatan lainnya, termasuk syarat dan ketentuannya.\n •	Anda dapat menjelaskan perbedaan antara BPJS dan asuransi kesehatan swasta, serta kelebihan dan kekurangan masing-masing.\n •	Anda dapat memberikan panduan tentang cara mengajukan klaim, dokumen yang diperlukan, dan proses klaim asuransi.\n •	Anda dapat menjawab pertanyaan tentang biaya premi, jangkauan perlindungan, serta cara memilih asuransi kesehatan yang sesuai dengan kebutuhan.  jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban 'maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih'"
-        console.log('Pesan diterima:', { sender, message }, await redisClient.get(sender));
+        console.log('Pesan diterima:', { sender, message });
         const greetings = ['hi', 'hello', 'hai', 'hallo', 'selamatpagi', 'selamatsiang', 'selamatsore', 'selamatmalam', 'start'];
         const menuText = ['registrasirawatjalan', 'riwayatmedis', 'penjadwalankonsultasi', 'bpjsdanasuransi', 'pembayarandanpenagihan'];
 
-        if (message != null) {
+        if (message != null && sender != null) {
             // Proses pesan Starting
             if (greetings.some(greeting => message.toLowerCase().replace(/\s+/g, '').includes(greeting))) {
                 await redisClient.del(sender);
@@ -181,56 +181,58 @@ async function handleWebhook(req: NextRequest) {
             }
 
         }
-        const storedMessage = await redisClient.get(sender);
-        const storedMenu = await redisClient.get(sender + "_menu");
-        const nik = await redisClient.get(sender + "_nik");
-
-        // khusus untuk menu 2 dan 4
-        if (storedMessage == 'biodata_done' && (storedMenu == '2' || storedMenu == 'riwayatmedis' || storedMenu == '4' || storedMenu == 'bpjsdanasuransi')) {
-            // dijawab oleh flowiseAI
-            let prompt: any = systemMessagePrompt2
-            if (storedMenu == '2' || storedMenu == 'riwayatmedis') {
-                prompt = systemMessagePrompt2
-            } else {
-                prompt = ststemMessagePrompt4
-            }
-            let response: any = await flowiseAIGeneral(message, prompt, sender);
-
-            if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
+        if(sender != null){
+            const storedMessage = await redisClient.get(sender);
+            const storedMenu = await redisClient.get(sender + "_menu");
+            const nik = await redisClient.get(sender + "_nik");
+    
+            // khusus untuk menu 2 dan 4
+            if (storedMessage == 'biodata_done' && (storedMenu == '2' || storedMenu == 'riwayatmedis' || storedMenu == '4' || storedMenu == 'bpjsdanasuransi')) {
+                // dijawab oleh flowiseAI
+                let prompt: any = systemMessagePrompt2
+                if (storedMenu == '2' || storedMenu == 'riwayatmedis') {
+                    prompt = systemMessagePrompt2
+                } else {
+                    prompt = ststemMessagePrompt4
+                }
+                let response: any = await flowiseAIGeneral(message, prompt, sender);
+    
+                if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
+                    const reply = response.text;
+                    await sendReply(sender, reply);
+                    await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
+                    return NextResponse.json({
+                        success: true,
+                        reply: reply
+                    });
+                }
+    
                 const reply = response.text;
                 await sendReply(sender, reply);
-                await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
                 return NextResponse.json({
                     success: true,
                     reply: reply
                 });
             }
-
-            const reply = response.text;
-            await sendReply(sender, reply);
-            return NextResponse.json({
-                success: true,
-                reply: reply
-            });
-        }
-
-        if (storedMessage == 'biodata_done' && (storedMenu == '1' || storedMenu == 'registrasirawatjalan' || storedMenu == '3' || storedMenu == 'penjadwalankonsultasi' || storedMenu == '5' || storedMenu == 'pembayarandanpenagihan')) {
-            const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n  If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
-            let table: any = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
-            if (storedMenu == '1' || storedMenu == 'registrasirawatjalan') {
-                table = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
-            } else if (storedMenu == '3' || storedMenu == 'penjadwalankonsultasi') {
-                table = 'pengguna,jadwal_konsultasi,antrean_medical_control'
-            } else {
-                table = 'pengguna,pembayaran'
+    
+            if (storedMessage == 'biodata_done' && (storedMenu == '1' || storedMenu == 'registrasirawatjalan' || storedMenu == '3' || storedMenu == 'penjadwalankonsultasi' || storedMenu == '5' || storedMenu == 'pembayarandanpenagihan')) {
+                const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n  If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
+                let table: any = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
+                if (storedMenu == '1' || storedMenu == 'registrasirawatjalan') {
+                    table = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
+                } else if (storedMenu == '3' || storedMenu == 'penjadwalankonsultasi') {
+                    table = 'pengguna,jadwal_konsultasi,antrean_medical_control'
+                } else {
+                    table = 'pengguna,pembayaran'
+                }
+                const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message);
+                const reply = response.text;
+                await sendReply(sender, reply);
+                return NextResponse.json({
+                    success: true,
+                    reply: reply
+                });
             }
-            const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message);
-            const reply = response.text;
-            await sendReply(sender, reply);
-            return NextResponse.json({
-                success: true,
-                reply: reply
-            });
         }
 
 
