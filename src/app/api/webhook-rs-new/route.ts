@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
 
 async function handleWebhook(req: NextRequest) {
     try {
+        console.log('Testing DISINI :', req);
         let sender, message: any;
 
         if (req.method === 'POST') {
