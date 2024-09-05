@@ -103,7 +103,8 @@ async function handleWebhook(req: NextRequest) {
                 await redisClient.set(sender, 'biodata_done');
                 console.log('Set message to biodata_done for sender:', sender);
                 await sendReply(sender, response.text);
-                await flowiseAIGeneral(response.text.replace('anda', 'aku'), systemMessagePrompt2, sender);
+                await flowiseAIGeneral(response.text, systemMessagePrompt2, sender);
+                console.log('Response flow 2:', response);
                 return NextResponse.json({
                     success: true,
                     reply: response
@@ -150,7 +151,8 @@ async function handleWebhook(req: NextRequest) {
                 await redisClient.set(sender, 'biodata_done');
                 console.log('Set message to biodata_done for sender:', sender);
                 await sendReply(sender, response.text);
-                await flowiseAIGeneral(response.text.replace('anda', 'aku'), ststemMessagePrompt4, sender);
+                await flowiseAIGeneral(response.text, ststemMessagePrompt4, sender);
+                console.log('Response flow 2:', response);
                 return NextResponse.json({
                     success: true,
                     reply: response
