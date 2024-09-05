@@ -273,7 +273,7 @@ async function handleWebhook(req: NextRequest) {
             }
         }
 
-        return NextResponse.json({ success: true, message: 'maaf , mungkin anda salah pilih menu , silahkan ketik `start` untuk memulai ulang' });
+        return NextResponse.json({ success: true, reply: 'maaf , mungkin anda salah pilih menu , silahkan ketik `start` untuk memulai ulang' } , { status: 200 });
     } catch (error) {
         console.error('Error:', error);
         return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
