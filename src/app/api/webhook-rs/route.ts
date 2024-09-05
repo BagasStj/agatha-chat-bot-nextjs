@@ -358,15 +358,15 @@ async function handleWebhook(req: NextRequest) {
                 }
                 let response: any = await flowiseAIGeneral(message, prompt, sender);
 
-                if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
-                    const reply = response.text;
-                    await sendReply(sender, reply);
-                    await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
-                    return NextResponse.json({
-                        success: true,
-                        reply: reply
-                    });
-                }
+                // if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
+                //     const reply = response.text;
+                //     await sendReply(sender, reply);
+                //     await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
+                //     return NextResponse.json({
+                //         success: true,
+                //         reply: reply
+                //     });
+                // }
 
                 const reply = response.text;
                 await sendReply(sender, reply);
