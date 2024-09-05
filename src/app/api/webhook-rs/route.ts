@@ -11,10 +11,10 @@ export async function GET(req: NextRequest) {
 
 async function handleWebhook(req: NextRequest) {
     try {
-        
+
         let sender, message: any;
-        
-       
+
+
         if (req.method === 'POST') {
             const body = await req.json();
             ({ sender, message } = body);
@@ -27,7 +27,7 @@ async function handleWebhook(req: NextRequest) {
         const systemMessagePrompt2 = 'Anda adalah seorang asisten AI yang sangat ahli dalam memberikan informasi medis dan pengetahuan tentang berbagai kondisi penyakit. Anda hanya dapat menjawab pertanyaan yang terkait dengan kondisi penyakit, pengobatan, gejala, penyebab, dan perawatan yang relevan. Anda tidak dapat menjawab pertanyaan yang berada di luar lingkup medis dan kesehatan. Setiap pertanyaan yang diajukan oleh pengguna tentang kondisi penyakit akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda untuk merujuk ke pertanyaan sebelumnya guna memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan: \n •	Pengguna dapat menanyakan gejala, penyebab, atau pengobatan dari suatu penyakit. \n•	Anda dapat memberikan informasi tentang langkah-langkah pencegahan, perawatan mandiri, atau kapan harus mencari bantuan medis profesional. \n•	Anda dapat menjelaskan perbedaan antara kondisi-kondisi yang sering disalahpahami atau memberikan saran umum berdasarkan pengetahuan medis yang terpercaya. jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban "maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih"';
         const ststemMessagePrompt4 = "Anda adalah asisten AI yang sangat berpengetahuan luas dalam hal asuransi kesehatan, termasuk BPJS dan berbagai jenis asuransi kesehatan lainnya. Anda hanya dapat menjawab pertanyaan yang terkait dengan informasi tentang BPJS, asuransi kesehatan, cakupan layanan, prosedur klaim, dan manfaat yang tersedia. Anda tidak dapat menjawab pertanyaan di luar lingkup asuransi kesehatan. Setiap pertanyaan yang diajukan oleh pengguna mengenai BPJS atau asuransi kesehatan akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda merujuk ke pertanyaan sebelumnya untuk memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan:\n •	Pengguna dapat menanyakan tentang jenis layanan yang ditanggung oleh BPJS atau asuransi kesehatan tertentu.\n •	Anda dapat memberikan informasi tentang prosedur pendaftaran BPJS atau asuransi kesehatan lainnya, termasuk syarat dan ketentuannya.\n •	Anda dapat menjelaskan perbedaan antara BPJS dan asuransi kesehatan swasta, serta kelebihan dan kekurangan masing-masing.\n •	Anda dapat memberikan panduan tentang cara mengajukan klaim, dokumen yang diperlukan, dan proses klaim asuransi.\n •	Anda dapat menjawab pertanyaan tentang biaya premi, jangkauan perlindungan, serta cara memilih asuransi kesehatan yang sesuai dengan kebutuhan.  jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban 'maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih'"
         console.log('Pesan diterima:', { sender, message });
-        const greetings = ['hi', 'hello', 'hai', 'hallo','halo', 'selamatpagi', 'selamatsiang', 'selamatsore', 'selamatmalam', 'start'];
+        const greetings = ['hi', 'hello', 'hai', 'hallo', 'halo', 'selamatpagi', 'selamatsiang', 'selamatsore', 'selamatmalam', 'start'];
         const menuText = ['registrasirawatjalan', 'riwayatmedis', 'penjadwalankonsultasi', 'bpjsdanasuransi', 'pembayarandanpenagihan'];
 
         if (message != null && sender != null) {
@@ -65,7 +65,7 @@ async function handleWebhook(req: NextRequest) {
             // Registrasi rawat jalan
             if (storedMessage == 'nik_done' && (storedMenu == '1' || storedMenu == 'registrasirawatjalan')) {
                 const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n if there is a question "sebutkan nomor antrean , waktu daftar , dan status dengan nik 1001", then answer with an example "berdasarkan nik 1001 , nomor antran anda adalah 2 dengan waktu daftar 2024-09-01 07:30:00.000 dan status terdaftar" . If the question relates to information that is not in this database, answer with "No results found in the database."\n   if there is a question "dengan dokter siapa yang harus saya temui jika nik saya 1002", then answer with an example "Anda harus bertemu dengan Dokter Jane Smith. di jam 08:00:00 sampai 12:00:00" . If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
-                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran', `sebutkan nomor antrean , waktu daftar , dan status dengan nik ${message}`);
+                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran', `sebutkan nomor antrean , waktu daftar , dan status dengan nik ${message}`,sender);
                 console.log('Response flow 1:', response);
                 if (response.text == 'Tidak ada hasil yang ditemukan dalam database.' || response.text == 'No results found in the database.') {
                     await sendReply(sender, ' Maaf , Untuk saat ini data yang anda masukan belum terdaftar atau belum melakukan registrasi rawat jalan 😔 ,\n mungkin anda salah pilih menu atau salah input nik anda ,\n untuk milih menu kembali silahkan ketik `start`');
@@ -115,7 +115,7 @@ async function handleWebhook(req: NextRequest) {
             if (storedMessage == 'nik_done' && (storedMenu == '3' || storedMenu == 'penjadwalankonsultasi')) {
                 console.log('MENJALANKAN PENJADWALAN KONSULTASI', message)
                 const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n if there is a question "sebutkan nik , nama lengkap , tanggal konseling , jam konseling , nomor antrean , dan status  dengan nik 1001", then answer with an example "berdasarkan nik 1001 , Jhon doe memiliki jadwal konseling tanggal 2024-09-10 pada jam 09:00:00 dan sekarang sudah memiliki nomor antrean 1 dengan status selesai" . If the question relates to information that is not in this database, answer with "No results found in the database." \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
-                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,jadwal_konsultasi,antrean_medical_control', `sebutkan nik , nama lengkap , tanggal konseling , jam konseling , nomor antrean , dan status  dengan nik ${message}`);
+                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,jadwal_konsultasi,antrean_medical_control', `sebutkan nik , nama lengkap , tanggal konseling , jam konseling , nomor antrean , dan status  dengan nik ${message}` , sender);
                 console.log('Response flow 1:', response);
                 if (response.text == 'Tidak ada hasil yang ditemukan dalam database.' || response.text == 'No results found in the database.') {
                     await sendReply(sender, ' Maaf , Untuk saat ini data yang anda masukan belum terdaftar atau belum melakukan registrasi rawat jalan 😔 ,\n mungkin anda salah pilih menu atau salah input nik anda ,\n untuk milih menu kembali silahkan ketik `start`');
@@ -163,7 +163,7 @@ async function handleWebhook(req: NextRequest) {
             if (storedMessage == 'nik_done' && (storedMenu == '5' || storedMenu == 'pembayarandanpenagihan')) {
                 console.log("MENJALANKAN PEMBAYARAN DAN PENAGIHAN", message)
                 const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n if there is a question " sebutkan status  , nik , nama dan jumlah dengan nik 1001", then answer with condition in status column an example "berdasarkan nik 1001 , nama anda adalah jhon doe dengan status pembayaran lunas " but if in status column "Belum Bayar" ,then asnwering "berdasarkan nik 1001 , nama anda adalah jhon doe dengan status pembayaran Belum Lunas , Lakukan pembuayaran secepatnya dengan metode Tunai / non tunai"  . If the question relates to information that is not in this database, answer with "No results found in the database."\n   if there is a question "dengan dokter siapa yang harus saya temui jika nik saya 1002", then answer with an example "Anda harus bertemu dengan Dokter Jane Smith. di jam 08:00:00 sampai 12:00:00" . If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
-                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,pembayaran', `sebutkan status pembayaran , nik , nama dan jumlah pembayaran dengan nik ${message}`);
+                const response = await flowiseAI_1_3_5(message, systemMessagePrompt, 'pengguna,pembayaran', `sebutkan status pembayaran , nik , nama dan jumlah pembayaran dengan nik ${message}`,sender);
                 console.log('Response flow 1:', response);
                 if (response.text == 'Tidak ada hasil yang ditemukan dalam database.' || response.text == 'No results found in the database.') {
                     await sendReply(sender, ' Maaf , Untuk saat ini data yang anda masukan belum terdaftar atau belum melakukan registrasi rawat jalan 😔 ,\n mungkin anda salah pilih menu atau salah input nik anda ,\n untuk milih menu kembali silahkan ketik `start`');
@@ -182,14 +182,10 @@ async function handleWebhook(req: NextRequest) {
                 });
             }
 
-        }
-        if(sender != null){
-            const storedMessage = await redisClient.get(sender);
-            const storedMenu = await redisClient.get(sender + "_menu");
             const nik = await redisClient.get(sender + "_nik");
 
             console.log("get information redis", storedMessage, storedMenu, nik)
-    
+
             // khusus untuk menu 2 dan 4
             if (storedMessage == 'biodata_done' && (storedMenu == '2' || storedMenu == 'riwayatmedis' || storedMenu == '4' || storedMenu == 'bpjsdanasuransi')) {
                 // dijawab oleh flowiseAI
@@ -201,7 +197,7 @@ async function handleWebhook(req: NextRequest) {
                     prompt = ststemMessagePrompt4
                 }
                 let response: any = await flowiseAIGeneral(message, prompt, sender);
-    
+
                 if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
                     const reply = response.text;
                     await sendReply(sender, reply);
@@ -211,7 +207,7 @@ async function handleWebhook(req: NextRequest) {
                         reply: reply
                     });
                 }
-    
+
                 const reply = response.text;
                 await sendReply(sender, reply);
                 return NextResponse.json({
@@ -219,7 +215,7 @@ async function handleWebhook(req: NextRequest) {
                     reply: reply
                 });
             }
-            
+
             if (storedMessage == 'biodata_done' && (storedMenu == '1' || storedMenu == 'registrasirawatjalan' || storedMenu == '3' || storedMenu == 'penjadwalankonsultasi' || storedMenu == '5' || storedMenu == 'pembayarandanpenagihan')) {
                 console.log("MENJALANKAN REGISTRASI RAWAT JALAN , PENJADWALAN KONSULTASI , DAN PEMBAYARAN DAN PENAGIHAN", message)
                 const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n  If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
@@ -232,7 +228,7 @@ async function handleWebhook(req: NextRequest) {
                     table = 'pengguna,pembayaran'
                 }
                 console.log("parameter", message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message)
-                const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message);
+                const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message , sender);
                 console.log("RESPONSE FLOW 1", response)
                 const reply = response.text;
                 await sendReply(sender, reply);
@@ -241,7 +237,9 @@ async function handleWebhook(req: NextRequest) {
                     reply: reply
                 });
             }
+
         }
+    
 
 
 
@@ -250,7 +248,7 @@ async function handleWebhook(req: NextRequest) {
         return NextResponse.json({ success: true, sendReplyResponse });
     } catch (error) {
         console.error('Error:', error);
-        return NextResponse.json({ success: false, error: 'Internal Server Error'  }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
@@ -294,7 +292,7 @@ async function flowiseAIGeneral(input: string, systemMessagePrompt: string, sess
     return responses.json();
 }
 
-async function flowiseAI_1_3_5(input: string, systemMessagePrompt: string, tablle: string, question: string) {
+async function flowiseAI_1_3_5(input: string, systemMessagePrompt: string, tablle: string, question: string , sessionid:any) {
     console.log("FLOWISEAIGENERAL", input, systemMessagePrompt, tablle)
     const url = 'https://flowiseai-railway-production-9629.up.railway.app/api/v1/prediction/8c1c3efc-a126-46dd-8f44-63b233494d46';
 
@@ -305,6 +303,7 @@ async function flowiseAI_1_3_5(input: string, systemMessagePrompt: string, tabll
         },
         body: JSON.stringify({
             question: question,
+            chatId: `0a9d3dff-265b-49a3-a41c-${sessionid}`,
             overrideConfig: {
                 includesTables: tablle,
                 customPrompt: systemMessagePrompt
