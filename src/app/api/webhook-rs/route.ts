@@ -187,10 +187,13 @@ async function handleWebhook(req: NextRequest) {
             const storedMessage = await redisClient.get(sender);
             const storedMenu = await redisClient.get(sender + "_menu");
             const nik = await redisClient.get(sender + "_nik");
+
+            console.log("get information redis", storedMessage, storedMenu, nik)
     
             // khusus untuk menu 2 dan 4
             if (storedMessage == 'biodata_done' && (storedMenu == '2' || storedMenu == 'riwayatmedis' || storedMenu == '4' || storedMenu == 'bpjsdanasuransi')) {
                 // dijawab oleh flowiseAI
+                console.log("MENJALANKAN RIWAYAT MEDIS DAN BPJS DAN ASURANSI", message)
                 let prompt: any = systemMessagePrompt2
                 if (storedMenu == '2' || storedMenu == 'riwayatmedis') {
                     prompt = systemMessagePrompt2
@@ -218,6 +221,7 @@ async function handleWebhook(req: NextRequest) {
             }
             
             if (storedMessage == 'biodata_done' && (storedMenu == '1' || storedMenu == 'registrasirawatjalan' || storedMenu == '3' || storedMenu == 'penjadwalankonsultasi' || storedMenu == '5' || storedMenu == 'pembayarandanpenagihan')) {
+                console.log("MENJALANKAN REGISTRASI RAWAT JALAN , PENJADWALAN KONSULTASI , DAN PEMBAYARAN DAN PENAGIHAN", message)
                 const systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n  If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
                 let table: any = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
                 if (storedMenu == '1' || storedMenu == 'registrasirawatjalan') {
@@ -227,7 +231,9 @@ async function handleWebhook(req: NextRequest) {
                 } else {
                     table = 'pengguna,pembayaran'
                 }
+                console.log("parameter", message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message)
                 const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message);
+                console.log("RESPONSE FLOW 1", response)
                 const reply = response.text;
                 await sendReply(sender, reply);
                 return NextResponse.json({
