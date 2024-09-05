@@ -364,7 +364,7 @@ Contoh penggunaan:
                 let systemMessagePrompt = 'Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. \n You can sort the results by relevant columns to return the most interesting examples in the database. \n  If the question relates to information that is not in this database, answer with "No results found in the database."  \n  Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. \n Also pay attention to which columns are in which tables.Please answer in Indonesian   Use the following format: \n Question: "Question here" \n SQLQuery: "SQL query to be executed" \n  SQLResult: "Result of SQLQuery \n "Answer: "Final answer here" \n Use only the tables listed below. {table_info} \n Question: {input}'
                 let table: any = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
                 if (storedMenu == '1' || storedMenu == 'registrasirawatjalan') {
-                    table = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran'
+                    table = 'pengguna,janji_temu,poli,dokter,jadwal_dokter,antrean_pendaftaran,area_rs'
                     systemMessagePrompt = `
                     Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. You can sort the results by relevant columns to return the most interesting examples in the database.
 
@@ -450,7 +450,7 @@ Contoh penggunaan:
                     table = 'pengguna,pembayaran'
                 }
                 console.log("parameter", message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message)
-                const response = await flowiseAI_1_3_5(message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message, sender);
+                const response = storedMenu == '1' || storedMenu == 'registrasirawatjalan' ? await flowiseAI_1(message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message, sender) : await flowiseAI_1_3_5(message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message, sender);
                 console.log("RESPONSE FLOW 1", response)
                 const reply = response.text;
                 await sendReply(sender, reply);
@@ -493,6 +493,8 @@ async function sendReply(to: string, message: string) {
     return response.json();
 }
 
+
+
 async function flowiseAIGeneral(input: string, systemMessagePrompt: string, sessionid: any) {
     console.log("FLOWISEAIGENERAL", input, systemMessagePrompt, sessionid)
     const url = 'https://flowiseai-railway-production-9629.up.railway.app/api/v1/prediction/c6ff5c51-b0d5-4875-a994-463ed49f0b25';
@@ -514,8 +516,27 @@ async function flowiseAIGeneral(input: string, systemMessagePrompt: string, sess
     return responses.json();
 }
 
+async function flowiseAI_1(input: string, systemMessagePrompt: string, tablle: string, question: string, sessionid: any) {
+    console.log("FLOWISEAI1 aja", input, systemMessagePrompt, tablle)
+    const url = 'https://flowiseai-railway-production-9629.up.railway.app/api/v1/prediction/d9f1c9f9-40af-4797-8428-a8e30dc4d504';
+
+    const responses = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            question: question,
+            chatId: `df0ae3a4-ec62-4d5d-b758-dc2ecb3e9cff`,
+
+        }),
+    });
+
+    return responses.json();
+}
+
 async function flowiseAI_1_3_5(input: string, systemMessagePrompt: string, tablle: string, question: string, sessionid: any) {
-    console.log("FLOWISEAIGENERAL", input, systemMessagePrompt, tablle)
+    console.log("FLOWISEAI123", input, systemMessagePrompt, tablle)
     const url = 'https://flowiseai-railway-production-9629.up.railway.app/api/v1/prediction/8c1c3efc-a126-46dd-8f44-63b233494d46';
 
     const responses = await fetch(url, {
