@@ -25,32 +25,7 @@ async function handleWebhook(req: NextRequest) {
         }
 
         const systemMessagePrompt2 = 'Anda adalah seorang asisten AI yang sangat ahli dalam memberikan informasi medis dan pengetahuan tentang berbagai kondisi penyakit. Anda hanya dapat menjawab pertanyaan yang terkait dengan kondisi penyakit, pengobatan, gejala, penyebab, dan perawatan yang relevan. Anda tidak dapat menjawab pertanyaan yang berada di luar lingkup medis dan kesehatan. Setiap pertanyaan yang diajukan oleh pengguna tentang kondisi penyakit akan dicatat dan disimpan dalam memori Anda, memungkinkan Anda untuk merujuk ke pertanyaan sebelumnya guna memberikan jawaban yang lebih akurat dan sesuai dengan konteks pertanyaan baru yang terkait. \n Contoh penggunaan: \n •	Pengguna dapat menanyakan gejala, penyebab, atau pengobatan dari suatu penyakit. \n•	Anda dapat memberikan informasi tentang langkah-langkah pencegahan, perawatan mandiri, atau kapan harus mencari bantuan medis profesional. \n•	Anda dapat menjelaskan perbedaan antara kondisi-kondisi yang sering disalahpahami atau memberikan saran umum berdasarkan pengetahuan medis yang terpercaya. jika terdapat pertanyaan yang tidak relevan , tolong berikan jawaban "maaf untuk saat ini saya hanya bisa menjawab tentang kesehatan atau kondisi medis . Jika anda ingin mengganti menu , tolong ketikan `start` . Terimakasih"';
-        const ststemMessagePrompt4 = `
-        Given an input question, first construct a syntactically correct {dialect} query to run, then look at the query results and return the answer. Unless the user specifies in their question a specific number of examples they want to get, always limit your query to a maximum of {top_k} results. You can sort the results by relevant columns to return the most interesting examples in the database.
-
-        The data provided is patient insurance and payment data. If the user asks about the payment received, answer by referring to the payment column and if the user asks about insurance, answer by referring to the insurance column.
-
-
-        if there is a question "berapa total pembayaran saya  {input}", then answer with an example "Berdasarkan NIK 1001, nama anda adalah Asep Knalpot, total pembayaran yang dilakukan sebesar 180000.00 pada tanggal 2024-09-03." . If the question relates to information that is not in this database, answer with "No results found in the database."
-
-        Never ask for all columns from a given table, ask for only a few columns that are relevant to the question.
-
-        Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. Also pay attention to which columns are in which tables.
-
-        Please answer in Indonesian
-
-        Use the following format:
-
-        Question: "Question here"
-        SQLQuery: "SQL query to be executed"
-        SQLResult: "Result of SQLQuery"
-        Answer: "Final answer here"
-
-        Use only the tables listed below.
-
-        {table_info}
-
-        Question: {input}`
+        const ststemMessagePrompt4 = 'anda adalah seorang asisten AI yang sangat'
 
 
         console.log('Pesan diterima:', { sender, message });
@@ -97,9 +72,9 @@ async function handleWebhook(req: NextRequest) {
 
                         The data provided are user data, registration queue, polyclinic, doctor, and doctor's schedule. Each data is related to each other. if the user asks about a doctor, then answer with something related to what the user has given
 
-                        If there is a question "mention the queue number, registration time, and status with NIK 1001", then answer with an example "based on NIK 1001 in the name of Jhon Doe, your queue number is 2 with a registration time of 2024-09-01 07:30 with a registered registration status. " If the question is related to information that is not in this database, answer with "No results found in the database."
+                        If there is a question "sebutkan nomor antrian, waktu registrasi, dan status dengan NIK 1001", then answer with an example "berdasarkan NIK 1001 atas nama Jhon Doe, nomor antrian Anda adalah 2 dengan waktu registrasi 2024-09-01 07:30 dengan status registrasi terdaftar. " If the question is related to information that is not in this database, answer with "No results found in the database."
 
-                        please answer in detail and in detail according to the data provided, use another column to add your explanation, for example if there is a question "dengan deokter siapa saya harus bertemu jika nik saya 1002", then answer with an example "based on NIK 1002 in the name of Bagas Setiaji, you should meet Dr. Jane Smith at the Dental Clinic, you can come to Area B - Inpatient Building " If the question relates to information that is not in this database, answer with "No results found in the database."
+                        please answer in detail and in detail according to the data provided, use another column to add your explanation, for example if there is a question "dengan deokter siapa saya harus bertemu jika nik saya 1002", then answer with an example "berdasarkan NIK 1002 atas nama Bagas Setiaji, sebaiknya Anda bertemu dengan drg. Jane Smith di Klinik Gigi, Anda dapat datang ke Area B - Gedung Rawat Inap" If the question relates to information that is not in this database, answer with "No results found in the database."
 
                         Be careful to only use column names that you can see in the schema description. Be careful not to ask for columns that do not exist. Also pay attention to which columns are in which tables.
 
@@ -358,15 +333,15 @@ async function handleWebhook(req: NextRequest) {
                 }
                 let response: any = await flowiseAIGeneral(message, prompt, sender);
 
-                // if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
-                //     const reply = response.text;
-                //     await sendReply(sender, reply);
-                //     await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
-                //     return NextResponse.json({
-                //         success: true,
-                //         reply: reply
-                //     });
-                // }
+                if (response.text.includes('Maaf untuk saat ini saya hanya ') || response.text.includes('Maaf, untuk saat ini saya hanya ')) {
+                    const reply = response.text;
+                    await sendReply(sender, reply);
+                    await sendReply(sender, 'Jika anda ingin mengakses menu lain silahkan ketik `start`');
+                    return NextResponse.json({
+                        success: true,
+                        reply: reply
+                    });
+                }
 
                 const reply = response.text;
                 await sendReply(sender, reply);
@@ -466,8 +441,8 @@ async function handleWebhook(req: NextRequest) {
                 Question: {input}`
                     table = 'pengguna,pembayaran'
                 }
-                console.log("parameter", message , systemMessagePrompt, table, message)
-                const response = await flowiseAI_1_3_5(message + storedMenu == '1' ? `dengan nik saya adalah ${nik}` : '', systemMessagePrompt, table, message, sender);
+                console.log("parameter", message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message)
+                const response = await flowiseAI_1_3_5(message + `jika nik saya adalah ${nik}`, systemMessagePrompt, table, message, sender);
                 console.log("RESPONSE FLOW 1", response)
                 const reply = response.text;
                 await sendReply(sender, reply);
