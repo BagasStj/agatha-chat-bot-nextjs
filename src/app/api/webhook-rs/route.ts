@@ -466,8 +466,8 @@ async function handleWebhook(req: NextRequest) {
                 Question: {input}`
                     table = 'pengguna,pembayaran'
                 }
-                console.log("parameter", message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message)
-                const response = await flowiseAI_1_3_5(message + `dengan nik saya adalah ${nik}`, systemMessagePrompt, table, message, sender);
+                console.log("parameter", message , systemMessagePrompt, table, message)
+                const response = await flowiseAI_1_3_5(message + storedMenu == '1' ? `dengan nik saya adalah ${nik}` : '', systemMessagePrompt, table, message, sender);
                 console.log("RESPONSE FLOW 1", response)
                 const reply = response.text;
                 await sendReply(sender, reply);
