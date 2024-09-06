@@ -193,7 +193,8 @@ async function handleWebhook(req: NextRequest) {
 
                 // Riwayat medis
                 if (storedMenu == '2' || storedMenu == 'riwayatmedis') {
-                    const response = await flowiseAIMenu_2(`${message} jika nik saya ${storedNIK}`, sender);
+                    // const response = await flowiseAIMenu_2(`${message} jika nik saya ${storedNIK}`, sender);
+                    const response = await flowiseAIGeneral(message, promptGeneral_2, sender);
                     console.log('FlowiseAI response:', response);
                     if (response.text == 'Tidak ada hasil yang ditemukan dalam database.' || response.text == 'No results found in the database.') {
                         const response_general = await flowiseAIGeneral(message, promptGeneral_2, sender);
@@ -233,7 +234,8 @@ async function handleWebhook(req: NextRequest) {
 
                 // BPJS dan Asuransi
                 if (storedMenu == '4' || storedMenu == 'bpjsdanasuransi') {
-                    const response = await flowiseAIMenu_4(`${message} jika nik saya ${storedNIK}`, sender);
+                    // const response = await flowiseAIMenu_4(`${message} jika nik saya ${storedNIK}`, sender);
+                    const response = await flowiseAIGeneral(message, promptGeneral_4, sender);
                     console.log('FlowiseAI response:', response);
                     if (response.text == 'Tidak ada hasil yang ditemukan dalam database.' || response.text == 'No results found in the database.') {
                         const response_general = await flowiseAIGeneral(message, promptGeneral_4, sender);  
