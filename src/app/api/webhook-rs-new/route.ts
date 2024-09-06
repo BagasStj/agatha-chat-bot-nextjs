@@ -184,7 +184,6 @@ async function handleWebhook(req: NextRequest) {
                     }
                     await sendReply(sender, response.text);
                     await redisClient.set(sender, 'nik_done');
-                    await redisClient.set(sender + "_nik", message)
                     return NextResponse.json({
                         success: true,
                         reply: response.text
@@ -206,7 +205,7 @@ async function handleWebhook(req: NextRequest) {
                     }
                     await sendReply(sender, response.text);
                     await redisClient.set(sender, 'nik_done');
-                    await redisClient.set(sender + "_nik", message)
+                    // await redisClient.set(sender + "_nik", message)
                     return NextResponse.json({
                         success: true,
                         reply: response.text
@@ -247,7 +246,7 @@ async function handleWebhook(req: NextRequest) {
                     }
                     await sendReply(sender, response.text);
                     await redisClient.set(sender, 'nik_done');
-                    await redisClient.set(sender + "_nik", message)
+                    // await redisClient.set(sender + "_nik", message)
                     return NextResponse.json({
                         success: true,
                         reply: response.text
@@ -267,7 +266,7 @@ async function handleWebhook(req: NextRequest) {
                     }
                     await sendReply(sender, response.text);
                     await redisClient.set(sender, 'nik_done');
-                    await redisClient.set(sender + "_nik", message)
+                    // await redisClient.set(sender + "_nik", message)
                     return NextResponse.json({
                         success: true,
                         reply: response.text
