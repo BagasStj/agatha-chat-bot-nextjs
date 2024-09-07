@@ -1,8 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import redisClient from '@/lib/redisClient';
 import { NextRequest, NextResponse } from 'next/server';
-
-const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,16 +27,6 @@ async function handleWebhook(req: NextRequest) {
             sender = params.get('sender');
             message = params.get('message');
         }
-
-        // Save sender and message to database
-        // if (sender && message) {
-        //     await prisma.message.create({
-        //         data: {
-        //             sender,
-        //             message,
-        //         },
-        //     });
-        // }
 
         // Proses pesan yang diterima
         console.log('Pesan diterima:', { sender, message });
@@ -299,9 +286,7 @@ async function handleWebhook(req: NextRequest) {
     } catch (error) {
         console.error('Error:', error);
         return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+    } 
 }
 
 async function sendReply(to: string, message: string) {
