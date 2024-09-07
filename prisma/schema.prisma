@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model antrean_medical_control {
+  id                   Int                @id @default(autoincrement())
+  jadwal_konsultasi_id Int?
+  nomor_antrean        Int?
+  waktu_daftar         DateTime?          @db.Timestamp(6)
+  status               String?            @db.VarChar(50)
+  jadwal_konsultasi    jadwal_konsultasi? @relation(fields: [jadwal_konsultasi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model antrean_pendaftaran {
+  id            Int         @id @default(autoincrement())
+  janji_temu_id Int?
+  pengguna_nik  Int?
+  nomor_antrean Int?
+  waktu_daftar  DateTime?   @db.Timestamp(6)
+  status        String?     @db.VarChar(50)
+  janji_temu    janji_temu? @relation(fields: [janji_temu_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna      pengguna?   @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model antrean_pengambilan_obat {
+  id               Int            @id @default(autoincrement())
+  janji_temu_id    Int?
+  pengguna_nik     Int?
+  riwayat_medis_id Int?
+  nomor_antrean    Int?
+  waktu_daftar     DateTime?      @db.Timestamp(6)
+  status           String?        @db.VarChar(50)
+  janji_temu       janji_temu?    @relation(fields: [janji_temu_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna         pengguna?      @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+  riwayat_medis    riwayat_medis? @relation(fields: [riwayat_medis_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model area_rs {
+  id         Int          @id @default(autoincrement())
+  namaarea   String?      @db.VarChar(255)
+  dokter_id  Int?
+  dokter     dokter[]
+  janji_temu janji_temu[]
+}
+
+model asuransi {
+  id           Int        @id @default(autoincrement())
+  pengguna_nik Int?
+  jeniskartu   String?    @db.VarChar(50)
+  nomorkartu   String?    @db.VarChar(50)
+  namakartu    String?    @db.VarChar(255)
+  masaberlaku  DateTime?  @db.Date
+  pengguna     pengguna?  @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+  penjamin     penjamin[]
+}
+
+model datanomorantrian {
+  id                Int      @id @default(autoincrement())
+  nama_lengkap      String   @db.VarChar(255)
+  nik               String   @db.VarChar(20)
+  nomor_hp          String   @db.VarChar(20)
+  jadwal_konsultasi DateTime @db.Timestamp(6)
+  nomor_antrean     Int
+  waktu_daftar      DateTime @db.Timestamp(6)
+  status            String   @db.VarChar(50)
+}
+
+model dokter {
+  id                Int                 @id @default(autoincrement())
+  nama              String?             @db.VarChar(255)
+  poli_id           Int?
+  area_id           Int?
+  hari              DateTime?           @db.Timestamp(6)
+  jam_mulai         DateTime?           @db.Time(6)
+  jam_selesai       DateTime?           @db.Time(6)
+  area_rs           area_rs?            @relation(fields: [area_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  poli              poli?               @relation(fields: [poli_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  jadwal_dokter     jadwal_dokter[]
+  jadwal_konsultasi jadwal_konsultasi[]
+  janji_temu        janji_temu[]
+  riwayat_medis     riwayat_medis[]
+}
+
+model jadwal_dokter {
+  id         Int          @id @default(autoincrement())
+  dokter_id  Int?
+  tanggal    DateTime?    @db.Date
+  status     String?      @db.VarChar(50)
+  dokter     dokter?      @relation(fields: [dokter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  janji_temu janji_temu[]
+}
+
+model jadwal_konsultasi {
+  id                      Int                       @id @default(autoincrement())
+  dokter_id               Int?
+  pengguna_nik            Int?
+  tanggal                 DateTime?                 @db.Date
+  jam                     DateTime?                 @db.Time(6)
+  antrean_medical_control antrean_medical_control[]
+  dokter                  dokter?                   @relation(fields: [dokter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna                pengguna?                 @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model janji_temu {
+  id                       Int                        @id @default(autoincrement())
+  pengguna_nik             Int?
+  dokter_id                Int?
+  poli_id                  Int?
+  area_rs_id               Int?
+  jadwal_dokter_id         Int?
+  antrean_pendaftaran      antrean_pendaftaran[]
+  antrean_pengambilan_obat antrean_pengambilan_obat[]
+  area_rs                  area_rs?                   @relation(fields: [area_rs_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dokter                   dokter?                    @relation(fields: [dokter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  jadwal_dokter            jadwal_dokter?             @relation(fields: [jadwal_dokter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna                 pengguna?                  @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+  poli                     poli?                      @relation(fields: [poli_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pembayaran               pembayaran[]
+}
+
+model pembayaran {
+  id            Int         @id @default(autoincrement())
+  janji_temu_id Int?
+  penjamin_id   Int?
+  jumlah        Decimal?    @db.Decimal(10, 2)
+  tanggal       DateTime?   @db.Date
+  metode        String?     @db.VarChar(50)
+  status        String?     @db.VarChar(50)
+  nik           Int?
+  janji_temu    janji_temu? @relation(fields: [janji_temu_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  penjamin      penjamin?   @relation(fields: [penjamin_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pengguna {
+  nik                      Int                        @id
+  namalengkap              String?                    @db.VarChar(255)
+  tanggallahir             DateTime?                  @db.Date
+  nomorhp                  String?                    @db.VarChar(20)
+  email                    String?                    @db.VarChar(255)
+  antrean_pendaftaran      antrean_pendaftaran[]
+  antrean_pengambilan_obat antrean_pengambilan_obat[]
+  asuransi                 asuransi[]
+  jadwal_konsultasi        jadwal_konsultasi[]
+  janji_temu               janji_temu[]
+  penjamin                 penjamin[]
+  riwayat_medis            riwayat_medis[]
+}
+
+model penjamin {
+  id           Int          @id @default(autoincrement())
+  pengguna_nik Int?
+  asuransi_id  Int?
+  pembayaran   pembayaran[]
+  asuransi     asuransi?    @relation(fields: [asuransi_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna     pengguna?    @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model poli {
+  id               Int          @id @default(autoincrement())
+  namapoli         String?      @db.VarChar(255)
+  namaspesialisasi String?      @db.VarChar(255)
+  dokter_id        Int?
+  dokter           dokter[]
+  janji_temu       janji_temu[]
+}
+
+model riwayat_medis {
+  id                       Int                        @id @default(autoincrement())
+  pengguna_nik             Int?
+  tanggal                  DateTime?                  @db.Date
+  diagnosa                 String?                    @db.VarChar
+  dokter_id                Int?
+  antrean_pengambilan_obat antrean_pengambilan_obat[]
+  dokter                   dokter?                    @relation(fields: [dokter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pengguna                 pengguna?                  @relation(fields: [pengguna_nik], references: [nik], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  sender    String
+  message   String
+  createdAt DateTime @default(now())
+}

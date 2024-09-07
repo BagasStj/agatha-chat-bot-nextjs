@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
 async function handleWebhook(req: NextRequest) {
     try {
-        // console.log('Testing DISINI :', req);
+        console.log('Testing DISINI :', req);
         let sender, message: any;
         const body = await req.json();
         ({ sender, message } = body);
