@@ -5,7 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
-    return handleWebhook(req);
+  try {
+    const result = await handleWebhook(req);
+    return result;
+  } catch (error) {
+    console.error('Error:', error);
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -26,14 +32,14 @@ async function handleWebhook(req: NextRequest) {
         }
 
         // Save sender and message to database
-        if (sender && message) {
-            await prisma.message.create({
-                data: {
-                    sender,
-                    message,
-                },
-            });
-        }
+        // if (sender && message) {
+        //     await prisma.message.create({
+        //         data: {
+        //             sender,
+        //             message,
+        //         },
+        //     });
+        // }
 
         // Proses pesan yang diterima
         console.log('Pesan diterima:', { sender, message });
