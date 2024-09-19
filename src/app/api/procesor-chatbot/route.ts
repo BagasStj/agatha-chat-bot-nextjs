@@ -312,7 +312,7 @@ async function flowiseAIGreeting(input: string, sessionid: any) {
         },
         body: JSON.stringify({
             question: input,
-            chatId: `68efeb4b-4583-49d5-84ee-9eccb503a91c`,
+            chatId: "b3ab0079-9b53-48d7-9f55-21f7f88298d9",
         }),
     });
 
