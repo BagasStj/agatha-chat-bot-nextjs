@@ -354,7 +354,7 @@ async function flowiseAIMenu_1(input: string, sessionid: any) {
         },
         body: JSON.stringify({
             question: input,
-            chatId: `0a9d3dff-265b-45a3-a32c-${sessionid}`,
+            chatId: `4e7f783f-5f43-43f5-b95c-bed808207304`,
         }),
     });
 
@@ -373,7 +373,7 @@ async function flowiseAIMenu_2(input: string, sessionid: any) {
         },
         body: JSON.stringify({
             question: input,
-            chatId: `0a3d2dff-321b-49a3-a43d-${sessionid}`,
+            chatId: "08acfb9e-c750-4f7f-977e-e6c27699c983",
         }),
     });
 
